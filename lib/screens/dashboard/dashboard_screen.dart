@@ -5,6 +5,7 @@ import '../../widgets/stat_card.dart';
 import '../../widgets/quick_action_button.dart';
 import '../../services/auth_service.dart';
 import '../login/login_screen.dart';
+import '../machine_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -145,17 +146,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 0.85, 
-                  children: const [
-                    StatCard(
-                      title: 'Total Machines',
-                      value: '142',
-                      subtitle: '128 Active',
-                      icon: Icons.precision_manufacturing,
-                      color: Colors.blue,
-                      trendValue: '12',
-                      isTrendUp: true,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MachineListScreen(),
+                          ),
+                        );
+                      },
+                      child: const StatCard(
+                        title: 'Total Machines',
+                        value: '142',
+                        subtitle: '128 Active',
+                        icon: Icons.precision_manufacturing,
+                        color: Colors.blue,
+                        trendValue: '12',
+                        isTrendUp: true,
+                      ),
                     ),
-                    StatCard(
+                    const StatCard(
                       title: 'Total Workers',
                       value: '56',
                       subtitle: 'Registered',
@@ -164,7 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       trendValue: '8',
                       isTrendUp: true,
                     ),
-                    StatCard(
+                    const StatCard(
                       title: 'Active Takas',
                       value: '24',
                       subtitle: 'In Production',
@@ -173,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       trendValue: '3',
                       isTrendUp: false,
                     ),
-                    StatCard(
+                    const StatCard(
                       title: 'Today\'s Prod.',
                       value: '4.2km',
                       subtitle: '₹12,450',
@@ -210,35 +221,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: QuickActionButton(
-                          icon: Icons.add_circle,
-                          label: 'Production',
-                          color: AppTheme.primaryBlue,
-                          onTap: () {},
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: QuickActionButton(
+                              icon: Icons.precision_manufacturing,
+                              label: 'Machines',
+                              color: AppTheme.primaryBlue,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MachineListScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: QuickActionButton(
+                              icon: Icons.assignment_ind,
+                              label: 'Worker',
+                              color: AppTheme.successGreen,
+                              onTap: () {},
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: QuickActionButton(
-                          icon: Icons.assignment_ind,
-                          label: 'Worker',
-                          color: AppTheme.successGreen,
-                          onTap: () {},
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: QuickActionButton(
-                          icon: Icons.post_add,
-                          label: 'New Taka',
-                          color: AppTheme.warningOrange,
-                          onTap: () {},
-                        ),
-                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                         children: [
+                          Expanded(
+                            child: QuickActionButton(
+                              icon: Icons.add_circle,
+                              label: 'Production',
+                              color: Colors.purple,
+                              onTap: () {},
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: QuickActionButton(
+                              icon: Icons.post_add,
+                              label: 'New Taka',
+                              color: AppTheme.warningOrange,
+                              onTap: () {},
+                            ),
+                          ),
+                         ]
+                      )
                     ],
                   ),
                 ),

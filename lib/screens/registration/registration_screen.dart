@@ -1,29 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
-import '../../config/constants.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
-import '../dashboard/dashboard_screen.dart';
-import '../registration/registration_screen.dart';
 import '../../services/auth_service.dart';
+import '../dashboard/dashboard_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegistrationScreenState extends State<RegistrationScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
 
-  void _handleLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-       ScaffoldMessenger.of(context).showSnackBar(
+  void _handleRegister() async {
+    // Basic Validation
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    if (_passwordController.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 6 characters')),
       );
       return;
     }
@@ -34,13 +51,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final user = await authService.signIn(
+      final user = await authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        name: _nameController.text.trim(),
       );
 
       if (user != null && mounted) {
         // Navigate to Dashboard
+        Navigator.popUntil(context, (route) => route.isFirst);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
@@ -63,8 +82,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -81,10 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
               // App Logo / Branding
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: AppTheme.primaryGradient,
                   shape: BoxShape.circle,
@@ -97,26 +118,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 child: const Icon(
-                  Icons.precision_manufacturing,
-                  size: 48,
+                  Icons.person_add,
+                  size: 32,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 24),
               const Text(
-                AppConstants.welcomeMessage,
+                'Create Account',
                 textAlign: TextAlign.center,
                 style: AppTheme.heading1,
               ),
               const SizedBox(height: 8),
               const Text(
-                AppConstants.loginSubtitle,
+                'Join Looms Management System',
                 textAlign: TextAlign.center,
                 style: AppTheme.subheading,
               ),
-              const SizedBox(height: 48),
-              
-              // Login Form Card
+              const SizedBox(height: 32),
+
+              // Register Form Card
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -133,6 +154,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     CustomTextField(
+                      hintText: 'Full Name',
+                      icon: Icons.person_outline,
+                      controller: _nameController,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
                       hintText: 'Email Address',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
@@ -145,32 +172,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       isPassword: true,
                       controller: _passwordController,
                     ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      hintText: 'Confirm Password',
+                      icon: Icons.lock_outline,
+                      isPassword: true,
+                      controller: _confirmPasswordController,
+                    ),
                     const SizedBox(height: 32),
                     GradientButton(
-                      text: 'Sign In',
-                      onPressed: _handleLogin,
+                      text: 'Register',
+                      onPressed: _handleRegister,
                       isLoading: _isLoading,
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    "Already have an account? ",
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   TextButton(
                     onPressed: () {
-                       Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegistrationScreen()),
-                      );
+                      Navigator.pop(context);
                     },
-                    child: const Text('Create Account'),
+                    child: const Text('Sign In'),
                   ),
                 ],
               ),

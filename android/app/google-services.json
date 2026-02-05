@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "158650970118",
+    "project_id": "mobile-looms",
+    "storage_bucket": "mobile-looms.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158650970118:android:d1158027b16e51f1a8d387",
+        "android_client_info": {
+          "package_name": "com.example.mobile_looms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8qXlSaXubtupxLbHuJukH_aR8lEyVseE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

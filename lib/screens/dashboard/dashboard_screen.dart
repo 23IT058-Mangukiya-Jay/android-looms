@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/quick_action_button.dart';
+import '../../services/auth_service.dart';
+import '../login/login_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -25,6 +28,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dashboard refreshed!')),
+      );
+    }
+  }
+
+  void _handleLogout() async {
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      await authService.signOut();
+      if (mounted) {
+        // Navigate back to Login and remove all previous routes
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error logging out: $e')),
       );
     }
   }
@@ -58,15 +80,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           backgroundColor: Colors.white24,
                           child: Icon(Icons.person, color: Colors.white),
                         ),
-                        IconButton(
-                          icon: _isRefreshing
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                )
-                              : const Icon(Icons.refresh, color: Colors.white),
-                          onPressed: _handleRefresh,
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: _isRefreshing
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.refresh, color: Colors.white),
+                              onPressed: _handleRefresh,
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.logout, color: Colors.white),
+                              onPressed: _handleLogout,
+                              tooltip: 'Logout',
+                            ),
+                          ],
                         ),
                       ],
                     ),

@@ -133,16 +133,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     CustomTextField(
-                      hintText: 'Email Address',
+                      label: 'Email Address',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailController,
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
-                      hintText: 'Password',
+                      label: 'Password',
                       icon: Icons.lock_outline,
-                      isPassword: true,
+                      obscureText: true,
                       controller: _passwordController,
                     ),
                     const SizedBox(height: 32),

@@ -6,6 +6,7 @@ import '../../widgets/quick_action_button.dart';
 import '../../services/auth_service.dart';
 import '../login/login_screen.dart';
 import '../machine_list_screen.dart';
+import '../../widgets/app_drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -56,6 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      drawer: const AppDrawer(),
       body: CustomScrollView(
         slivers: [
           // Custom App Bar / Header

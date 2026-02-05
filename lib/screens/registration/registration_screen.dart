@@ -154,29 +154,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Column(
                   children: [
                     CustomTextField(
-                      hintText: 'Full Name',
+                      label: 'Full Name',
                       icon: Icons.person_outline,
                       controller: _nameController,
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
-                      hintText: 'Email Address',
+                      label: 'Email Address',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailController,
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
-                      hintText: 'Password',
+                      label: 'Password',
                       icon: Icons.lock_outline,
-                      isPassword: true,
+                      obscureText: true,
                       controller: _passwordController,
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
-                      hintText: 'Confirm Password',
+                      label: 'Confirm Password',
                       icon: Icons.lock_outline,
-                      isPassword: true,
+                      obscureText: true,
                       controller: _confirmPasswordController,
                     ),
                     const SizedBox(height: 32),

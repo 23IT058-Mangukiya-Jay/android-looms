@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/machine_model.dart';
 import '../services/database_service.dart';
 import 'add_edit_machine_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class MachineListScreen extends StatelessWidget {
   const MachineListScreen({super.key});
@@ -12,6 +13,7 @@ class MachineListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Machines (Looms)'),
       ),
+      drawer: const AppDrawer(),
       body: StreamBuilder<List<Machine>>(
         stream: DatabaseService().getMachines(),
         builder: (context, snapshot) {

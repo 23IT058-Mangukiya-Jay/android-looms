@@ -10,6 +10,7 @@ import '../screens/workers/worker_list_screen.dart';
 import '../screens/users/user_list_screen.dart';
 import '../screens/reports/report_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/settings/settings_screen.dart';
 // import '../screens/login/login_screen.dart'; // Handled by auth wrapper usually
 
 class AppDrawer extends StatelessWidget {
@@ -41,6 +42,7 @@ class AppDrawer extends StatelessWidget {
           _buildDrawerItem(context, 'Users', Icons.manage_accounts, const UserListScreen()),
           _buildDrawerItem(context, 'Reports', Icons.analytics, const ReportScreen()),
           const Divider(),
+          _buildDrawerItem(context, 'Settings', Icons.settings, const SettingsScreen()),
           _buildDrawerItem(context, 'Profile', Icons.person_outline, const ProfileScreen()),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),

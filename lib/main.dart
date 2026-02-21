@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'config/theme.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/auth_service.dart';
+import 'providers/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -23,35 +27,26 @@ class MyApp extends StatelessWidget {
         Provider<AuthService>(
           create: (_) => AuthService(),
         ),
-        StreamProvider(
+        StreamProvider<User?>(
           create: (context) => context.read<AuthService>().authStateChanges,
           initialData: null,
         ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(),
+        ),
       ],
-      child: MaterialApp(
-        title: 'Looms Management',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: const AuthWrapper(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Looms Management',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: ThemeData.dark(), // Simple dark theme for now
+            themeMode: themeProvider.themeMode,
+            home: const SplashScreen(),
+          );
+        },
       ),
     );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final user = context.watch<User?>(); // Watch the stream
-    
-    // You might want to show a loading spinner while checking auth state 
-    // but StreamProvider initialData is null, so it defaults to Login.
-    // Ideally we check connection state if we want to be precise.
-    
-    if (user != null) {
-      return const DashboardScreen();
-    }
-    return const LoginScreen();
   }
 }

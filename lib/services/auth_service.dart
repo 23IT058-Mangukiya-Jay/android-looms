@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,6 +17,10 @@ class AuthService {
         email: email,
         password: password,
       );
+      if (result.user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+      }
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -40,6 +45,8 @@ class AuthService {
       if (result.user != null) {
         await result.user!.updateDisplayName(name);
         await result.user!.reload();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
       }
       
       return result.user;
@@ -53,6 +60,8 @@ class AuthService {
   // Sign Out
   Future<void> signOut() async {
     await _auth.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
   }
 
   // Helper for error messages

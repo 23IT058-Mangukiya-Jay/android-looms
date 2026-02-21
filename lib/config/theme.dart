@@ -8,7 +8,7 @@ class AppTheme {
   static const Color warningOrange = Color(0xFFF59E0B);
   static const Color errorRed = Color(0xFFEF4444);
   static const Color purple = Color(0xFF8B5CF6);
-  static const Color background = Color(0xFFF8FAFC); // Slate 50
+  static const Color background = Colors.white; // Pure White
   static const Color surface = Colors.white;
 
   // Gradients
@@ -67,11 +67,84 @@ class AppTheme {
 
   static ThemeData get lightTheme {
     return ThemeData(
-      primarySwatch: Colors.blue,
-      primaryColor: primaryBlue,
-      scaffoldBackgroundColor: background,
-      fontFamily: 'Inter', // Assuming Inter is available or fallback to system
       useMaterial3: true,
+      colorScheme: const ColorScheme.light(
+        primary: primaryBlue,
+        secondary: indigo,
+        surface: Colors.white,
+        background: background,
+        error: errorRed,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: Color(0xFF1F2937),
+        onBackground: Color(0xFF1F2937),
+      ),
+      scaffoldBackgroundColor: background,
+      fontFamily: 'Inter',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: primaryBlue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primaryBlue, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+    );
+  }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: const ColorScheme.dark(
+        primary: primaryBlue,
+        secondary: indigo,
+        surface: Color(0xFF1F2937), // Dark Gray
+        background: Color(0xFF111827), // Darker Gray
+        error: errorRed,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: Colors.white,
+        onBackground: Colors.white,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF111827),
+      fontFamily: 'Inter',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1F2937),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF374151), // Gray 700
+        hintStyle: const TextStyle(color: Colors.grey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF4B5563)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF4B5563)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primaryBlue, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
     );
   }
 }

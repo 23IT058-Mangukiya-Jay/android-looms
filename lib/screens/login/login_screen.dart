@@ -73,8 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppTheme.bgGradient,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          // Optional: Add a subtle gradient ONLY if light mode, or use solid background
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
@@ -86,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: AppTheme.primaryGradient, // Keep brand gradient for logo
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -103,16 +104,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 AppConstants.welcomeMessage,
                 textAlign: TextAlign.center,
-                style: AppTheme.heading1,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 AppConstants.loginSubtitle,
                 textAlign: TextAlign.center,
-                style: AppTheme.subheading,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    ),
               ),
               const SizedBox(height: 48),
               
@@ -120,11 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.1), // Subtle shadow
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),

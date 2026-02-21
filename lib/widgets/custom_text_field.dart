@@ -27,11 +27,10 @@ class CustomTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF374151), // Gray 700
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                // OnSurface color handles light/dark appropriately
+              ),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -40,29 +39,15 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           validator: validator,
           maxLines: maxLines,
+          style: Theme.of(context).textTheme.bodyLarge, // Ensure text color matches theme
           decoration: InputDecoration(
             hintText: 'Enter $label',
             prefixIcon: icon != null ? Icon(icon) : null,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFD1D5DB)), // Gray 300
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.blue, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-          ),
+            // Borders and FillColor are now handled by Theme.of(context).inputDecorationTheme
+            // We can override if necessary, but relying on theme is better for consistency.
+            // If we want slightly different defaults for this widget, we can keep some,
+            // but for the "invisible text" bug, we mainly need the proper style inheritance.
+          ).applyDefaults(Theme.of(context).inputDecorationTheme),
         ),
       ],
     );

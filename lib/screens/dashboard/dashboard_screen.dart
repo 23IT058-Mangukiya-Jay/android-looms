@@ -56,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const AppDrawer(),
       body: CustomScrollView(
         slivers: [
@@ -65,59 +65,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
             expandedHeight: 180.0,
             floating: false,
             pinned: true,
-            backgroundColor: AppTheme.primaryBlue,
+            backgroundColor: Theme.of(context).primaryColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).primaryColor.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.white24,
-                          child: Icon(Icons.person, color: Colors.white),
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: _isRefreshing
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.refresh, color: Colors.white),
-                              onPressed: _handleRefresh,
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.logout, color: Colors.white),
-                              onPressed: _handleLogout,
-                              tooltip: 'Logout',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Welcome Back!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    // Top row: avatar + refresh pinned to top
+                    Positioned(
+                      top: 60,
+                      left: 24,
+                      right: 24,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const CircleAvatar(
+                            backgroundColor: Colors.white24,
+                            child: Icon(Icons.person, color: Colors.white),
+                          ),
+                          IconButton(
+                            icon: _isRefreshing
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white, strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.refresh, color: Colors.white),
+                            onPressed: _handleRefresh,
+                          ),
+                        ],
                       ),
                     ),
-                    const Text(
-                      'Monitor your looms in real-time',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                    // Bottom text: pinned to bottom
+                    Positioned(
+                      bottom: 24,
+                      left: 24,
+                      right: 24,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text(
+                            'Welcome Back!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Monitor your looms in real-time',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -132,12 +146,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 // Stats Grid
-                const Text(
+                Text(
                   'Overview',
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -201,19 +213,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 24),
 
                 // Quick Actions
-                const Text(
+                Text(
                   'Quick Actions',
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -223,60 +233,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.precision_manufacturing,
-                              label: 'Machines',
-                              color: AppTheme.primaryBlue,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const MachineListScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.assignment_ind,
-                              label: 'Worker',
-                              color: AppTheme.successGreen,
-                              onTap: () {},
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: QuickActionButton(
+                          icon: Icons.add_circle,
+                          label: 'Production',
+                          color: const Color(0xFF3B82F6), // Blue
+                          onTap: () {},
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                         children: [
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.add_circle,
-                              label: 'Production',
-                              color: Colors.purple,
-                              onTap: () {},
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.post_add,
-                              label: 'New Taka',
-                              color: AppTheme.warningOrange,
-                              onTap: () {},
-                            ),
-                          ),
-                         ]
-                      )
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: QuickActionButton(
+                          icon: Icons.assignment_ind,
+                          label: 'Worker',
+                          color: const Color(0xFF10B981), // Green
+                          onTap: () {},
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: QuickActionButton(
+                          icon: Icons.post_add,
+                          label: 'New Taka',
+                          color: const Color(0xFFF59E0B), // Orange
+                          onTap: () {},
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -284,12 +268,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 24),
                 
                 // Shift Summary Placeholder
-                const Text(
+                Text(
                   'Shift Summary',
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -321,9 +303,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[100]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -349,18 +331,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xFF4B5563),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 Text(
                   production,
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: Color(0xFF1F2937),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -369,11 +350,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
+              Text(
                 'Earnings',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF9CA3AF),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 ),
               ),
               Text(

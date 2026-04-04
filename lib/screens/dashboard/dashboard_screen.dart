@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 import '../login/login_screen.dart';
 import '../machine_list_screen.dart';
 import '../../widgets/app_drawer.dart';
+import '../analytics/analytics_dashboard_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -255,10 +256,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: QuickActionButton(
-                          icon: Icons.post_add,
-                          label: 'New Taka',
-                          color: const Color(0xFFF59E0B), // Orange
-                          onTap: () {},
+                          icon: Icons.bar_chart,
+                          label: 'Analytics',
+                          color: const Color(0xFF4F46E5), // Indigo
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AnalyticsDashboardScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],

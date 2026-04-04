@@ -14,6 +14,7 @@ import '../screens/settings/settings_screen.dart';
 // import '../screens/login/login_screen.dart'; // Handled by auth wrapper usually
 import '../screens/api/api_posts_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
+import '../screens/analytics/analytics_dashboard_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -45,6 +46,7 @@ class AppDrawer extends StatelessWidget {
           _buildDrawerItem(context, 'Reports', Icons.analytics, const ReportScreen()),
           _buildDrawerItem(context, 'Industry Posts (API)', Icons.rss_feed, const ApiPostsScreen()),
           _buildDrawerItem(context, 'Notifications', Icons.notifications_active, const NotificationsScreen()),
+          _buildDrawerItem(context, 'Analytics', Icons.bar_chart, const AnalyticsDashboardScreen()),
           const Divider(),
           _buildDrawerItem(context, 'Settings', Icons.settings, const SettingsScreen()),
           _buildDrawerItem(context, 'Profile', Icons.person_outline, const ProfileScreen()),

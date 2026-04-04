@@ -86,19 +86,21 @@ class MachineListScreen extends StatelessWidget {
   void _confirmDelete(BuildContext context, Machine machine) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Machine'),
         content: Text(
             'Are you sure you want to delete ${machine.machineCode}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
               await DatabaseService().deleteMachine(machine.id);
-              Navigator.pop(context); // Close dialog
+              if (dialogContext.mounted) {
+                Navigator.pop(dialogContext); // Close dialog
+              }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),

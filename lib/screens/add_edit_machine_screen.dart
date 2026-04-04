@@ -115,6 +115,7 @@ class _AddEditMachineScreenState extends State<AddEditMachineScreen> {
                     TextFormField(
                       controller: _machineCodeController,
                       decoration: const InputDecoration(labelText: 'Machine Code'),
+                      maxLength: 20,
                       validator: (value) =>
                           value!.isEmpty ? 'Please enter machine code' : null,
                     ),
@@ -122,6 +123,7 @@ class _AddEditMachineScreenState extends State<AddEditMachineScreen> {
                     TextFormField(
                       controller: _machineNameController,
                       decoration: const InputDecoration(labelText: 'Machine Name'),
+                      maxLength: 50,
                       validator: (value) =>
                           value!.isEmpty ? 'Please enter machine name' : null,
                     ),
@@ -129,6 +131,7 @@ class _AddEditMachineScreenState extends State<AddEditMachineScreen> {
                     TextFormField(
                       controller: _machineTypeController,
                       decoration: const InputDecoration(labelText: 'Machine Type'),
+                      maxLength: 30,
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(

@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── User-scoped data ────────────────────────────────────────────────────
+    // Each authenticated user can only read/write their own sub-collections.
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── Legacy top-level machines collection (read-only for migration) ──────
+    // Allows authenticated users to read the old flat 'machines' collection
+    // so existing data isn't completely blocked. Remove after migration.
+    match /machines/{machineId} {
+      allow read: if request.auth != null;
+      allow write: if false; // No new writes to old collection
+    }
+
+    // ── Deny everything else ────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

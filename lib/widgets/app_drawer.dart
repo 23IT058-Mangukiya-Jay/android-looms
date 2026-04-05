@@ -11,7 +11,7 @@ import '../screens/users/user_list_screen.dart';
 import '../screens/reports/report_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/settings/settings_screen.dart';
-// import '../screens/login/login_screen.dart'; // Handled by auth wrapper usually
+import '../screens/login/login_screen.dart';
 import '../screens/api/api_posts_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/analytics/analytics_dashboard_screen.dart';
@@ -56,6 +56,13 @@ class AppDrawer extends StatelessWidget {
             onTap: () async {
               Navigator.pop(context); // Close drawer
               await context.read<AuthService>().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],

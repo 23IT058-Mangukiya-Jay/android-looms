@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/post_model.dart';
 import '../../services/api_service.dart';
+import '../../widgets/app_drawer.dart';
 import 'post_detail_screen.dart';
 
 /// Lab 9 – API Integration Screen
@@ -85,6 +86,7 @@ class _ApiPostsScreenState extends State<ApiPostsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4FF),
+      drawer: const AppDrawer(),
       body: CustomScrollView(
         slivers: [
           _buildSliverAppBar(),
@@ -104,6 +106,13 @@ class _ApiPostsScreenState extends State<ApiPostsScreen>
       expandedHeight: 160,
       floating: false,
       pinned: true,
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          tooltip: 'Open Menu',
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+      ),
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
         title: const Text(

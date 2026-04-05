@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// Background FCM message handler – must be a top-level function.
@@ -99,45 +100,56 @@ class NotificationService {
 
   // ─── FCM ────────────────────────────────────────────────────────────────────
   Future<void> _initFCM() async {
-    // Request permission (iOS & Android 13+)
-    NotificationSettings settings = await _fcm.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
-    debugPrint('🔑 FCM Permission: ${settings.authorizationStatus}');
+    try {
+      // Request permission (iOS & Android 13+)
+      NotificationSettings settings = await _fcm.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+      debugPrint('🔑 FCM Permission: ${settings.authorizationStatus}');
 
-    // Register background handler
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    // Get and print FCM device token
-    String? token = await _fcm.getToken();
-    debugPrint('📱 FCM Device Token: $token');
-
-    // Foreground FCM messages → show as local notification
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('📩 [FCM Foreground] ${message.notification?.title}');
-      if (message.notification != null) {
-        showInstantNotification(
-          title: message.notification!.title ?? 'Looms Alert',
-          body: message.notification!.body ?? '',
-          payload: message.data['route'],
-        );
+      // Background handler is NOT supported on web
+      if (!kIsWeb) {
+        FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       }
-    });
 
-    // Notification opened from background (app was minimised)
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('🚀 [FCM] Opened from background: ${message.data}');
-      onNotificationTap?.call(message.data['route']);
-    });
+      // Get and print FCM device token
+      // On web (localhost) this may fail — wrap in try/catch
+      try {
+        String? token = await _fcm.getToken();
+        debugPrint('📱 FCM Device Token: $token');
+      } catch (e) {
+        debugPrint('⚠️ Could not get FCM token (expected on localhost): $e');
+      }
 
-    // Notification that launched the app when it was terminated
-    RemoteMessage? initialMessage = await _fcm.getInitialMessage();
-    if (initialMessage != null) {
-      debugPrint('🚀 [FCM] App launched from notification');
-      onNotificationTap?.call(initialMessage.data['route']);
+      // Foreground FCM messages → show as local notification
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        debugPrint('📩 [FCM Foreground] ${message.notification?.title}');
+        if (message.notification != null) {
+          showInstantNotification(
+            title: message.notification!.title ?? 'Looms Alert',
+            body: message.notification!.body ?? '',
+            payload: message.data['route'],
+          );
+        }
+      });
+
+      // Notification opened from background (app was minimised)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint('🚀 [FCM] Opened from background: ${message.data}');
+        onNotificationTap?.call(message.data['route']);
+      });
+
+      // Notification that launched the app when it was terminated
+      RemoteMessage? initialMessage = await _fcm.getInitialMessage();
+      if (initialMessage != null) {
+        debugPrint('🚀 [FCM] App launched from notification');
+        onNotificationTap?.call(initialMessage.data['route']);
+      }
+    } catch (e) {
+      debugPrint('⚠️ FCM initialization error (non-fatal on web): $e');
     }
   }
 

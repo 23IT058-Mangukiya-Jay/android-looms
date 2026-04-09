@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
+import '../../models/worker_model.dart';
 
 class AddEditWorkerScreen extends StatefulWidget {
-  final String? workerId;
-  const AddEditWorkerScreen({super.key, this.workerId});
+  final Worker? worker;
+  const AddEditWorkerScreen({super.key, this.worker});
 
   @override
   State<AddEditWorkerScreen> createState() => _AddEditWorkerScreenState();
@@ -21,8 +22,21 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
   String _shift = 'Day';
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.worker != null) {
+      _nameController.text = widget.worker!.name;
+      _codeController.text = widget.worker!.workerCode;
+      _phoneController.text = widget.worker!.phone ?? '';
+      _addressController.text = widget.worker!.address ?? '';
+      _workerType = widget.worker!.workerType;
+      _shift = widget.worker!.shift;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isEditing = widget.workerId != null;
+    final isEditing = widget.worker != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,10 +100,16 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
                 text: isEditing ? 'Update Worker' : 'Create Worker',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                    final newWorker = Worker(
+                      id: isEditing ? widget.worker!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                      name: _nameController.text,
+                      workerCode: _codeController.text,
+                      workerType: _workerType,
+                      shift: _shift,
+                      phone: _phoneController.text.isEmpty ? null : _phoneController.text,
+                      address: _addressController.text.isEmpty ? null : _addressController.text,
                     );
-                    Navigator.pop(context);
+                    Navigator.pop(context, newWorker);
                   }
                 },
               ),

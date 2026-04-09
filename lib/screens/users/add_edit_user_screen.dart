@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
+import '../../models/user_model.dart';
 
 class AddEditUserScreen extends StatefulWidget {
-  final String? userId; // If null, create mode
-  const AddEditUserScreen({super.key, this.userId});
+  final User? user; // If null, create mode
+  const AddEditUserScreen({super.key, this.user});
 
   @override
   State<AddEditUserScreen> createState() => _AddEditUserScreenState();
@@ -19,8 +20,18 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   String _role = 'manager';
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.user != null) {
+      _nameController.text = widget.user!.name;
+      _emailController.text = widget.user!.email;
+      _role = widget.user!.role;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isEditing = widget.userId != null;
+    final isEditing = widget.user != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -75,10 +86,15 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                 text: isEditing ? 'Update User' : 'Create User',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                    final newUser = User(
+                      id: isEditing ? widget.user!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                      name: _nameController.text,
+                      email: _emailController.text,
+                      role: _role,
+                      createdAt: isEditing ? widget.user!.createdAt : DateTime.now(),
+                      lastLogin: isEditing ? widget.user!.lastLogin : null,
                     );
-                    Navigator.pop(context);
+                    Navigator.pop(context, newUser);
                   }
                 },
               ),

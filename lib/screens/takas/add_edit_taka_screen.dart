@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
+import '../../models/taka_model.dart';
 
 class AddEditTakaScreen extends StatefulWidget {
-  final String? takaId;
-  const AddEditTakaScreen({super.key, this.takaId});
+  final Taka? taka;
+  const AddEditTakaScreen({super.key, this.taka});
 
   @override
   State<AddEditTakaScreen> createState() => _AddEditTakaScreenState();
@@ -25,8 +26,23 @@ class _AddEditTakaScreenState extends State<AddEditTakaScreen> {
   final List<String> _qualities = ['Cotton 60s', 'Polyester 40s'];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.taka != null) {
+      _takaNumberController.text = widget.taka!.takaNumber;
+      _targetMetersController.text = widget.taka!.targetMeters.toString();
+      _rateController.text = widget.taka!.ratePerMeter.toString();
+      _selectedMachine = widget.taka!.machineName;
+      _selectedQuality = widget.taka!.qualityName;
+      _status = widget.taka!.status;
+      if (!_machines.contains(_selectedMachine)) _selectedMachine = null;
+      if (!_qualities.contains(_selectedQuality)) _selectedQuality = null;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isEditing = widget.takaId != null;
+    final isEditing = widget.taka != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -136,10 +152,25 @@ class _AddEditTakaScreenState extends State<AddEditTakaScreen> {
                 text: isEditing ? 'Update Taka' : 'Create Taka',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                    final target = double.parse(_targetMetersController.text);
+                    final rate = double.parse(_rateController.text);
+                    
+                    final newTaka = Taka(
+                      id: isEditing ? widget.taka!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                      takaNumber: _takaNumberController.text,
+                      machineId: 'm1', // dummy
+                      machineName: _selectedMachine!,
+                      qualityId: 'q1', // dummy
+                      qualityName: _selectedQuality!,
+                      targetMeters: target,
+                      totalMeters: isEditing ? widget.taka!.totalMeters : 0.0,
+                      ratePerMeter: rate,
+                      status: _status,
+                      totalEarnings: isEditing ? widget.taka!.totalEarnings : 0.0,
+                      startDate: isEditing ? widget.taka!.startDate : DateTime.now(),
+                      endDate: isEditing ? widget.taka!.endDate : null,
                     );
-                    Navigator.pop(context);
+                    Navigator.pop(context, newTaka);
                   }
                 },
               ),

@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../widgets/app_drawer.dart';
 import '../../widgets/gradient_button.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:csv/csv.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -73,16 +76,189 @@ class _ReportScreenState extends State<ReportScreen> {
                   );
                   return;
                 }
-                // Mock Generation
-                showDialog(
-                  context: context, 
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Report Generated'),
-                    content: Text('Generated $_reportType report for ${_selectedDateRange!.start.toString().split(' ')[0]} to ${_selectedDateRange!.end.toString().split(' ')[0]}'),
-                    actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-                  )
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => GeneratedReportScreen(
+                      dateRange: _selectedDateRange!,
+                      reportType: _reportType,
+                    ),
+                  ),
                 );
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GeneratedReportScreen extends StatefulWidget {
+  final DateTimeRange dateRange;
+  final String reportType;
+
+  const GeneratedReportScreen({
+    super.key,
+    required this.dateRange,
+    required this.reportType,
+  });
+
+  @override
+  State<GeneratedReportScreen> createState() => _GeneratedReportScreenState();
+}
+
+class _GeneratedReportScreenState extends State<GeneratedReportScreen> {
+  bool _isDownloading = false;
+
+  Future<void> _downloadReport(List<Map<String, String>> data) async {
+    setState(() {
+      _isDownloading = true;
+    });
+
+    try {
+      // Prepare CSV data
+      List<List<dynamic>> csvData = [];
+      if (data.isNotEmpty) {
+        // Headers
+        csvData.add(data.first.keys.toList());
+        // Rows
+        for (var row in data) {
+          csvData.add(row.values.toList());
+        }
+      }
+      String csvContent = const ListToCsvConverter().convert(csvData);
+
+      // Get Directory
+      Directory? directory;
+      if (Platform.isAndroid) {
+         directory = await getExternalStorageDirectory();
+         // fallback to app docs if external is null
+         directory ??= await getApplicationDocumentsDirectory();
+      } else {
+         directory = await getApplicationDocumentsDirectory();
+      }
+
+      final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String fileName = '${widget.reportType}_Report_$timeStamp.csv';
+      final String filePath = '${directory.path}/$fileName';
+
+      final File file = File(filePath);
+      await file.writeAsString(csvContent);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Successfully downloaded to: \n$filePath', maxLines: 3), 
+            duration: const Duration(seconds: 4),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to download: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final startStr = widget.dateRange.start.toString().split(' ')[0];
+    final endStr = widget.dateRange.end.toString().split(' ')[0];
+    
+    // Generate dummy data based on report type
+    List<Map<String, String>> data = [];
+    if (widget.reportType == 'Production') {
+      data = [
+        {'Date': startStr, 'Machine': 'Loom 01', 'Meters': '450.5'},
+        {'Date': startStr, 'Machine': 'Loom 02', 'Meters': '620.0'},
+        {'Date': endStr, 'Machine': 'Loom 01', 'Meters': '490.2'},
+      ];
+    } else if (widget.reportType == 'Workers') {
+      data = [
+        {'Name': 'Rajesh Kumar', 'Shift': 'Day', 'Attendance': '95%'},
+        {'Name': 'Suresh Singh', 'Shift': 'Night', 'Attendance': '88%'},
+      ];
+    } else if (widget.reportType == 'Takas') {
+      data = [
+        {'Taka No': 'T-1001', 'Status': 'Completed', 'Meters': '1000'},
+        {'Taka No': 'T-1002', 'Status': 'Active', 'Meters': '450'},
+      ];
+    } else {
+      data = [
+        {'Date': startStr, 'Amount': '₹12,450'},
+        {'Date': endStr, 'Amount': '₹14,200'},
+      ];
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.reportType} Report'),
+        actions: [
+          _isDownloading
+              ? const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () => _downloadReport(data),
+                )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              color: Colors.blue[50],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                     Text(
+                      '${widget.reportType} Summary',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('From: $startStr  To: $endStr'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: data.first.keys
+                        .map((key) => DataColumn(label: Text(key, style: const TextStyle(fontWeight: FontWeight.bold))))
+                        .toList(),
+                    rows: data.map((row) {
+                      return DataRow(
+                        cells: row.values.map((value) => DataCell(Text(value))).toList(),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

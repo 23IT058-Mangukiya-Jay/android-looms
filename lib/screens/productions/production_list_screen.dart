@@ -3,13 +3,16 @@ import '../../widgets/app_drawer.dart';
 import '../../models/production_model.dart';
 import 'add_edit_production_screen.dart';
 
-class ProductionListScreen extends StatelessWidget {
+class ProductionListScreen extends StatefulWidget {
   const ProductionListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Dummy Data
-    final List<Production> productions = [
+  State<ProductionListScreen> createState() => _ProductionListScreenState();
+}
+
+class _ProductionListScreenState extends State<ProductionListScreen> {
+  // Dummy Data
+  final List<Production> productions = [
       Production(
         id: '1',
         date: DateTime.now(),
@@ -38,6 +41,8 @@ class ProductionListScreen extends StatelessWidget {
       ),
     ];
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Productions'),
@@ -69,29 +74,87 @@ class ProductionListScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              trailing: Text(
-                '₹${production.earnings.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                  fontSize: 14,
-                ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '₹${production.earnings.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    onPressed: () async {
+                      final updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddEditProductionScreen(production: production),
+                        ),
+                      );
+                      if (updated != null && updated is Production) {
+                        setState(() {
+                          final prodIndex = productions.indexWhere((p) => p.id == updated.id);
+                          if (prodIndex != -1) {
+                            productions[prodIndex] = updated;
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      _confirmDelete(context, production);
+                    },
+                  ),
+                ],
               ),
-              onTap: () {
-                 // Edit in future
-              },
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final newProduction = await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AddEditProductionScreen()),
           );
+          if (newProduction != null && newProduction is Production) {
+            setState(() {
+              productions.add(newProduction);
+            });
+          }
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, Production production) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Production'),
+        content: Text('Are you sure you want to delete this production record?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                productions.remove(production);
+              });
+              Navigator.pop(dialogContext); // Close dialog
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

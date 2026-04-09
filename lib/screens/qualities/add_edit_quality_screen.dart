@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
+import '../../models/quality_model.dart';
 
 class AddEditQualityScreen extends StatefulWidget {
-  final String? qualityId;
-  const AddEditQualityScreen({super.key, this.qualityId});
+  final Quality? quality;
+  const AddEditQualityScreen({super.key, this.quality});
 
   @override
   State<AddEditQualityScreen> createState() => _AddEditQualityScreenState();
@@ -17,8 +18,18 @@ class _AddEditQualityScreenState extends State<AddEditQualityScreen> {
   final _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.quality != null) {
+      _nameController.text = widget.quality!.name;
+      _rateController.text = widget.quality!.ratePerMeter.toString();
+      _descriptionController.text = widget.quality!.description;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isEditing = widget.qualityId != null;
+    final isEditing = widget.quality != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -58,10 +69,14 @@ class _AddEditQualityScreenState extends State<AddEditQualityScreen> {
                 text: isEditing ? 'Update Quality' : 'Save Quality',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                    final newQuality = Quality(
+                      id: isEditing ? widget.quality!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                      name: _nameController.text,
+                      ratePerMeter: double.parse(_rateController.text),
+                      description: _descriptionController.text,
+                      createdAt: isEditing ? widget.quality!.createdAt : DateTime.now(),
                     );
-                    Navigator.pop(context);
+                    Navigator.pop(context, newQuality);
                   }
                 },
               ),

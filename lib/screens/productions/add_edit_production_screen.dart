@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/gradient_button.dart';
+import '../../models/production_model.dart';
 
 class AddEditProductionScreen extends StatefulWidget {
-  const AddEditProductionScreen({super.key});
+  final Production? production;
+
+  const AddEditProductionScreen({super.key, this.production});
 
   @override
   State<AddEditProductionScreen> createState() => _AddEditProductionScreenState();
@@ -12,22 +15,30 @@ class AddEditProductionScreen extends StatefulWidget {
 class _AddEditProductionScreenState extends State<AddEditProductionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _metersController = TextEditingController();
+  final _machineController = TextEditingController();
+  final _workerController = TextEditingController();
+  final _takaController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   String _selectedShift = 'Day';
-  String? _selectedMachine;
-  String? _selectedWorker;
-  String? _selectedTaka;
 
-  // Dummy Data for Dropdowns
-  final List<String> _machines = ['Loom 01', 'Loom 02', 'Loom 03', 'Loom 04'];
-  final List<String> _workers = ['Ram Kumar', 'Shyam Singh', 'Mohan Lal'];
-  final List<String> _takas = ['Taka-101', 'Taka-102', 'Taka-103'];
+  @override
+  void initState() {
+    super.initState();
+    if (widget.production != null) {
+      _metersController.text = widget.production!.metersProduced.toString();
+      _machineController.text = widget.production!.machineName;
+      _workerController.text = widget.production!.workerName;
+      _takaController.text = widget.production!.takaNumber;
+      _selectedDate = widget.production!.date;
+      _selectedShift = widget.production!.shift;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Record Production'),
+        title: Text(widget.production == null ? 'Record Production' : 'Edit Production'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -86,69 +97,42 @@ class _AddEditProductionScreenState extends State<AddEditProductionScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Machine Dropdown
-              DropdownButtonFormField<String>(
-                value: _selectedMachine,
-                decoration: const InputDecoration(
-                  labelText: 'Machine',
-                  border: OutlineInputBorder(),
-                ),
-                items: _machines.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedMachine = newValue;
-                  });
+              // Machine Input
+              CustomTextField(
+                controller: _machineController,
+                label: 'Machine Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a machine name';
+                  }
+                  return null;
                 },
-                validator: (value) => value == null ? 'Please select a machine' : null,
               ),
               const SizedBox(height: 16),
 
-              // Worker Dropdown
-              DropdownButtonFormField<String>(
-                value: _selectedWorker,
-                decoration: const InputDecoration(
-                  labelText: 'Worker',
-                  border: OutlineInputBorder(),
-                ),
-                items: _workers.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedWorker = newValue;
-                  });
+              // Worker Input
+              CustomTextField(
+                controller: _workerController,
+                label: 'Worker Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a worker name';
+                  }
+                  return null;
                 },
-                validator: (value) => value == null ? 'Please select a worker' : null,
               ),
               const SizedBox(height: 16),
 
-              // Taka Dropdown
-              DropdownButtonFormField<String>(
-                value: _selectedTaka,
-                decoration: const InputDecoration(
-                  labelText: 'Taka',
-                  border: OutlineInputBorder(),
-                ),
-                items: _takas.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedTaka = newValue;
-                  });
+              // Taka Input
+              CustomTextField(
+                controller: _takaController,
+                label: 'Taka Number',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a taka number';
+                  }
+                  return null;
                 },
-                validator: (value) => value == null ? 'Please select a taka' : null,
               ),
               const SizedBox(height: 16),
 
@@ -176,7 +160,21 @@ class _AddEditProductionScreenState extends State<AddEditProductionScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Processing Data')),
                     );
-                    Navigator.pop(context);
+                    final meters = double.parse(_metersController.text);
+                    final updatedProduction = Production(
+                      id: widget.production?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                      date: _selectedDate,
+                      machineId: 'm3', // dummy machine id
+                      machineName: _machineController.text,
+                      workerId: 'w3', // dummy worker id
+                      workerName: _workerController.text,
+                      takaId: 't3', // dummy taka id
+                      takaNumber: _takaController.text,
+                      shift: _selectedShift,
+                      metersProduced: meters,
+                      earnings: meters * 10.0, // dummy calculation for earnings
+                    );
+                    Navigator.pop(context, updatedProduction);
                   }
                 },
               ),
@@ -190,6 +188,9 @@ class _AddEditProductionScreenState extends State<AddEditProductionScreen> {
   @override
   void dispose() {
     _metersController.dispose();
+    _machineController.dispose();
+    _workerController.dispose();
+    _takaController.dispose();
     super.dispose();
   }
 }

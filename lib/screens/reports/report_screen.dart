@@ -4,6 +4,7 @@ import '../../widgets/app_drawer.dart';
 import '../../widgets/gradient_button.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -148,10 +149,14 @@ class _GeneratedReportScreenState extends State<GeneratedReportScreen> {
       await file.writeAsString(csvContent);
 
       if (mounted) {
+        // Using share_plus to invoke the OS target selection dialog
+        // so the user can save to Files, Drive, Email, etc!
+        await Share.shareXFiles([XFile(filePath)], text: '${widget.reportType} Report Generated!');
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully downloaded to: \n$filePath', maxLines: 3), 
-            duration: const Duration(seconds: 4),
+          const SnackBar(
+            content: Text('Report generated successfully! Select where to save or share it.', maxLines: 3), 
+            duration: Duration(seconds: 4),
             backgroundColor: Colors.green,
           ),
         );
@@ -159,7 +164,7 @@ class _GeneratedReportScreenState extends State<GeneratedReportScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to download: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Failed to export: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {

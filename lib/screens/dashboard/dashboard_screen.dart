@@ -9,6 +9,9 @@ import '../login/login_screen.dart';
 import '../machine_list_screen.dart';
 import '../../widgets/app_drawer.dart';
 import '../analytics/analytics_dashboard_screen.dart';
+import '../workers/worker_list_screen.dart';
+import '../takas/taka_list_screen.dart';
+import '../productions/production_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -197,14 +200,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           builder: (context, snapshot) {
                             final docs = snapshot.data?.docs ?? [];
                             final count = docs.isEmpty ? 3 : docs.length; // Fallback to 3 static dummy UI elements
-                            return StatCard(
-                              title: 'Total Workers',
-                              value: count.toString(),
-                              subtitle: 'Active',
-                              icon: Icons.people,
-                              color: Colors.green,
-                              trendValue: '',
-                              isTrendUp: true,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const WorkerListScreen(),
+                                  ),
+                                );
+                              },
+                              child: StatCard(
+                                title: 'Total Workers',
+                                value: count.toString(),
+                                subtitle: 'Active',
+                                icon: Icons.people,
+                                color: Colors.green,
+                                trendValue: '',
+                                isTrendUp: true,
+                              ),
                             );
                           },
                         ),
@@ -213,14 +226,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           builder: (context, snapshot) {
                             final docs = snapshot.data?.docs ?? [];
                             final count = docs.isEmpty ? 2 : docs.length; // Fallback to 2 static dummy UI elements
-                            return StatCard(
-                              title: 'Active Takas',
-                              value: count.toString(),
-                              subtitle: 'In Production',
-                              icon: Icons.inventory_2,
-                              color: Colors.amber,
-                              trendValue: '',
-                              isTrendUp: false,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const TakaListScreen(),
+                                  ),
+                                );
+                              },
+                              child: StatCard(
+                                title: 'Active Takas',
+                                value: count.toString(),
+                                subtitle: 'In Production',
+                                icon: Icons.inventory_2,
+                                color: Colors.amber,
+                                trendValue: '',
+                                isTrendUp: false,
+                              ),
                             );
                           },
                         ),
@@ -238,14 +261,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               }
                             }
                             final displayVal = docs.isEmpty ? '4.2km' : '${totalMeters > 0 ? totalMeters : docs.length}m';
-                            return StatCard(
-                              title: 'Today\'s Prod.',
-                              value: displayVal,
-                              subtitle: 'Meters / Logs',
-                              icon: Icons.trending_up,
-                              color: Colors.purple,
-                              trendValue: '',
-                              isTrendUp: true,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ProductionListScreen(),
+                                  ),
+                                );
+                              },
+                              child: StatCard(
+                                title: 'Today\'s Prod.',
+                                value: displayVal,
+                                subtitle: 'Meters / Logs',
+                                icon: Icons.trending_up,
+                                color: Colors.purple,
+                                trendValue: '',
+                                isTrendUp: true,
+                              ),
                             );
                           },
                         ),
@@ -284,7 +317,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           icon: Icons.add_circle,
                           label: 'Production',
                           color: const Color(0xFF3B82F6), // Blue
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ProductionListScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -293,7 +333,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           icon: Icons.assignment_ind,
                           label: 'Worker',
                           color: const Color(0xFF10B981), // Green
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const WorkerListScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),

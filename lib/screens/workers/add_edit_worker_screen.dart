@@ -17,9 +17,8 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
   final _codeController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
-
-  String _workerType = 'Permanent';
-  String _shift = 'Day';
+  final _workerTypeController = TextEditingController();
+  final _shiftController = TextEditingController();
 
   @override
   void initState() {
@@ -29,8 +28,8 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
       _codeController.text = widget.worker!.workerCode;
       _phoneController.text = widget.worker!.phone ?? '';
       _addressController.text = widget.worker!.address ?? '';
-      _workerType = widget.worker!.workerType;
-      _shift = widget.worker!.shift;
+      _workerTypeController.text = widget.worker!.workerType;
+      _shiftController.text = widget.worker!.shift;
     }
   }
 
@@ -61,24 +60,17 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
                 validator: (value) => value!.isEmpty ? 'Please enter code' : null,
               ),
               const SizedBox(height: 16),
-              
-              DropdownButtonFormField<String>(
-                value: _workerType,
-                decoration: const InputDecoration(labelText: 'Worker Type', border: OutlineInputBorder()),
-                items: ['Permanent', 'Temporary'].map((String value) {
-                  return DropdownMenuItem<String>( value: value, child: Text(value) );
-                }).toList(),
-                onChanged: (newValue) => setState(() => _workerType = newValue!),
+              CustomTextField(
+                controller: _workerTypeController,
+                label: 'Worker Type (e.g. Permanent, Temporary, Sub-contract)',
+                validator: (value) => value!.isEmpty ? 'Please enter worker type' : null,
               ),
               const SizedBox(height: 16),
 
-              DropdownButtonFormField<String>(
-                value: _shift,
-                decoration: const InputDecoration(labelText: 'Shift', border: OutlineInputBorder()),
-                 items: ['Day', 'Night', 'Both', 'None'].map((String value) {
-                  return DropdownMenuItem<String>( value: value, child: Text(value) );
-                }).toList(),
-                onChanged: (newValue) => setState(() => _shift = newValue!),
+              CustomTextField(
+                controller: _shiftController,
+                label: 'Shift (e.g. Day, Night, Part-Time)',
+                validator: (value) => value!.isEmpty ? 'Please enter shift' : null,
               ),
               const SizedBox(height: 16),
 
@@ -104,8 +96,8 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
                       id: isEditing ? widget.worker!.id : DateTime.now().millisecondsSinceEpoch.toString(),
                       name: _nameController.text,
                       workerCode: _codeController.text,
-                      workerType: _workerType,
-                      shift: _shift,
+                      workerType: _workerTypeController.text,
+                      shift: _shiftController.text,
                       phone: _phoneController.text.isEmpty ? null : _phoneController.text,
                       address: _addressController.text.isEmpty ? null : _addressController.text,
                     );
@@ -126,6 +118,8 @@ class _AddEditWorkerScreenState extends State<AddEditWorkerScreen> {
     _codeController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _workerTypeController.dispose();
+    _shiftController.dispose();
     super.dispose();
   }
 }
